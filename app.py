@@ -1,6 +1,10 @@
 import streamlit as st
 from exa_py import Exa
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env if it exists
+load_dotenv()
 
 # Page configuration
 st.set_page_config(page_title="Exa News Explorer", page_icon="📡", layout="wide")
@@ -8,7 +12,14 @@ st.set_page_config(page_title="Exa News Explorer", page_icon="📡", layout="wid
 # Sidebar for API Keys
 with st.sidebar:
     st.title("Settings")
-    exa_api_key = st.text_input("Exa API Key", type="password")
+    # Check if key is available in environment
+    env_key = os.getenv("EXA_API_KEY")
+    if env_key:
+        st.success("✅ Exa API Key loaded from .env file")
+        exa_api_key = env_key
+    else:
+        exa_api_key = st.text_input("Exa API Key", type="password")
+    
     st.markdown("---")
     st.info("Get your API key at [Exa Dashboard](https://dashboard.exa.ai)")
 
@@ -19,7 +30,7 @@ Enter a topic below to find the most recent news using **Exa's Neural Search**.
 
 # Initialize client if key is provided
 if not exa_api_key:
-    st.warning("⚠️ Please provide your Exa API key in the sidebar to start.")
+    st.warning("⚠️ Please provide your Exa API key in the sidebar or .env file to start.")
     st.stop()
 
 exa_client = Exa(api_key=exa_api_key)
